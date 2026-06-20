@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<!--  Sets the language of the page to English -->
+<html lang="en">
+
+<head>
+    <!-- <meta> tags handle encoding and responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanjeevani Hospital | Home</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Hugeicons icon library -->
+    <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+
+    <!-- Theme preference applied before paint to avoid flash -->
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+
+<body>
+    <!-- ══════════════════════════════════════════════
+         TOP NAVIGATION BAR
+    ══════════════════════════════════════════════ -->
+    <header class="topbar">
+        <!-- Brand / Logo -->
+        <div class="brand">
+            <span class="brand-icon-wrap">
+                <i class="hgi hgi-stroke hgi-hospital-02"></i>
+            </span>
+            <span class="brand-text">Sanjeevani<span class="brand-accent"> Hospital</span></span>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="nav-links" role="navigation" aria-label="Main navigation">
+            <a href="{{ url_for('home') }}" id="nav-home">
+                <i class="hgi hgi-stroke hgi-home-01"></i>
+                <span>Home</span>
+            </a>
+            <a href="{{ url_for('patients') }}" id="nav-patients">
+                <i class="hgi hgi-stroke hgi-user-multiple-02"></i>
+                <span>Patients</span>
+            </a>
+            <a href="{{ url_for('doctors') }}" id="nav-doctors">
+                <i class="hgi hgi-stroke hgi-stethoscope-02"></i>
+                <span>Doctors</span>
+            </a>
+            <a href="{{ url_for('appointments') }}" id="nav-appointments">
+                <i class="hgi hgi-stroke hgi-calendar-02"></i>
+                <span>Appointments</span>
+            </a>
+            <a href="{{ url_for('treatments') }}" id="nav-treatments">
+                <i class="hgi hgi-stroke hgi-medicine-02"></i>
+                <span>Treatments</span>
+            </a>
+            <a href="{{ url_for('billing') }}" id="nav-billing">
+                <i class="hgi hgi-stroke hgi-invoice-02"></i>
+                <span>Billing</span>
+            </a>
+        </nav>
+
+        <!-- Right Controls -->
+        <div class="topbar-right">
+            <button id="themeToggle" class="theme-btn" title="Toggle Theme" aria-label="Toggle theme">
+                <i class="hgi hgi-stroke hgi-sun-02" id="theme-icon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ══════════════════════════════════════════════
+         MAIN CONTENT AREA
+    ══════════════════════════════════════════════ -->
+    <main class="main-content">
+        {% block content %}
+
+        <!-- ── HERO SECTION ── -->
+        <section class="hero-section">
+            <!-- Animated background blobs -->
+            <div class="hero-blob hero-blob-1"></div>
+            <div class="hero-blob hero-blob-2"></div>
+            <div class="hero-blob hero-blob-3"></div>
+
+            <!-- Hero content -->
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-branding">
+                        <span class="brand-top">Sanjeevani</span>
+                        <span class="brand-bottom">Hospital</span>
+                    </div>
+                    <!-- Main headline -->
+                    <h1 class="hero-title">
+                        <span class="gradient-text">Precision in Practice</span><br>
+                        Excellence in Care
+                    </h1>
+
+                    <!-- Sub-headline -->
+                    <p class="hero-subtitle">
+                        Managing healthcare records with precision. Our integrated system connects doctors, patients
+                        and treatments in real-time
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="hero-actions">
+                        <a href="/appointments/add" class="btn btn-primary btn-lg">
+                            <i class="hgi hgi-stroke hgi-calendar-add-01"></i> Book Appointment
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hero Image -->
+                <div class="hero-image-wrap">
+                    <img src="{{ url_for('static', filename='Img1.webp') }}" alt="Sanjeevani Hospital"
+                        class="hero-main-img">
+                </div>
+            </div>
+        </section>
+
+        {% endblock %}
+    </main>
+
+    <!-- ══════════════════════════════════════════════
+         THEME TOGGLE SCRIPT
+    ══════════════════════════════════════════════ -->
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.className = 'hgi hgi-stroke hgi-moon-02';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeIcon.className = 'hgi hgi-stroke hgi-sun-02';
+            }
+            // Set cookie for backend awareness
+            document.cookie = `theme=${theme}; path=/; max-age=31536000`;
+        }
+
+        // Initialise icon on load
+        applyTheme(localStorage.getItem('theme') || 'dark');
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+
+        });
+
+        // Highlight active nav link
+        const links = document.querySelectorAll('.nav-links a');
+        links.forEach(link => {
+            if (link.href === window.location.href) link.classList.add('active');
+        });
+    </script>
+</body>
+
+</html>

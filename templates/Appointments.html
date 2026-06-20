@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <h2>Appointments</h2>
+</div>
+
+<div class="tabs">
+    <a href="/appointments/add" class="btn {% if mode == 'add' %}btn-primary{% else %}btn-secondary{% endif %}">➕
+        Book</a>
+    <a href="/appointments/search" class="btn {% if mode == 'search' %}btn-primary{% else %}btn-secondary{% endif %}">🔍
+        Find</a>
+</div>
+
+{% if mode == 'add' or mode == 'edit' %}
+<div class="card">
+    <h3 class="card-title">{% if mode == 'edit' %}Edit Appointment{% else %}Schedule Appointment{% endif %}</h3>
+    <form method="POST" action="{% if mode == 'edit' %}/update_appointment{% else %}/add_appointment{% endif %}">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Appt ID</label>
+                <input type="text" name="appointment_id" value="{% if mode == 'edit' %}{{ appointment[0] }}{% else %}{{ next_id }}{% endif %}" readonly
+                    style="background-color: var(--th-bg); color: var(--text-muted); cursor: not-allowed; font-weight: bold; border-color: transparent;">
+            </div>
+            <div class="form-group">
+                <label>Patient ID</label>
+                <input type="text" name="patient_id" value="{% if mode == 'edit' %}{{ appointment[1] }}{% endif %}" placeholder="Patient ID" required>
+            </div>
+            <div class="form-group">
+                <label>Doctor ID</label>
+                <input type="text" name="doctor_id" value="{% if mode == 'edit' %}{{ appointment[2] }}{% endif %}" placeholder="Doctor ID" required>
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="appointment_date" value="{% if mode == 'edit' %}{{ appointment[3] }}{% endif %}" required>
+            </div>
+            <div class="form-group">
+                <label>Time</label>
+                <input type="time" name="appointment_time" value="{% if mode == 'edit' %}{{ appointment[4] }}{% endif %}" required>
+            </div>
+            <div class="form-group">
+                <label>Reason for Visit</label>
+                <input type="text" name="reason_for_visit" value="{% if mode == 'edit' %}{{ appointment[5] }}{% endif %}" placeholder="Reason" required>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" required>
+                    <!-- Default to 'Scheduled' if adding, or pre-fill if editing -->
+                    <option value="Scheduled" {% if (mode == 'edit' and appointment[6] == 'Scheduled') or mode == 'add' %}selected{% endif %}>Scheduled</option>
+                    <option value="Completed" {% if mode == 'edit' and appointment[6] == 'Completed' %}selected{% endif %}>Completed</option>
+                    <option value="Cancelled" {% if mode == 'edit' and appointment[6] == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    <option value="No-show" {% if mode == 'edit' and appointment[6] == 'No-show' %}selected{% endif %}>No-show</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{% if mode == 'edit' %}Update Appointment{% else %}Add Appointment{% endif %}</button>
+            {% if mode == 'edit' %}
+            <a href="/appointments/search" class="btn btn-secondary">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% if mode == 'search' %}
+<div class="card">
+    <h3 class="card-title">Search Appointments</h3>
+    <form method="POST" action="/appointments/search">
+        <div style="display: flex; gap: 1rem;">
+            <input type="text" name="search_query" value="{{ search_term if search_term else '' }}"
+                placeholder="Search by Appt ID, Patient ID, or Doctor ID..." required style="flex: 1;">
+            <button type="submit" class="btn btn-primary">🔍 Find</button>
+            <a href="/appointments/search" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% if mode == 'view' or mode == 'search' %}
+{% if mode == 'view' or appointments|length > 0 %}
+<div class="card">
+    <h3 class="card-title">{% if mode == 'view' %}All Appointment Records{% else %}Search Results{% endif %}</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Patient ID</th>
+                    <th>Doctor ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    {% if mode == 'search' %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in appointments %}
+                <tr>
+                    <td>{{ a[0] }}</td>
+                    <td>{{ a[1] }}</td>
+                    <td>{{ a[2] }}</td>
+                    <td>{{ a[3] }}</td>
+                    <td>{{ a[4] }}</td>
+                    <td>{{ a[5] }}</td>
+                    <td>
+                        {% if a[6] == 'Scheduled' %}
+                        <span
+                            style="padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500; background-color: #DBEAFE; color: #1E40AF;">{{
+                            a[6] }}</span>
+                        {% elif a[6] == 'Completed' %}
+                        <span
+                            style="padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500; background-color: #D1FAE5; color: #065F46;">{{
+                            a[6] }}</span>
+                        {% elif a[6] == 'No-show' %}
+                        <span
+                            style="padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500; background-color: #F3E8FF; color: #6B21A8;">{{
+                            a[6] }}</span>
+                        {% else %}
+                        <span
+                            style="padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500; background-color: #FEE2E2; color: #991B1B;">{{
+                            a[6] }}</span>
+                        {% endif %}
+                    </td>
+                    {% if mode == 'search' %}
+                    <td>
+                        <div class="action-btns">
+                            <form method="GET" action="/edit_appointment/{{ a[0] }}">
+                                <button type="submit" class="btn btn-edit" title="Edit"><i
+                                        class="hgi hgi-stroke hgi-pencil-edit-01"></i></button>
+                            </form>
+                            <form method="POST" action="/delete_appointment/{{ a[0] }}">
+                                <button type="submit" class="btn btn-danger" title="Delete"><i
+                                        class="hgi hgi-stroke hgi-delete-02"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% elif mode == 'search' and search_term %}
+<div class="card">
+    <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No appointments found matching "{{
+        search_term }}".</p>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

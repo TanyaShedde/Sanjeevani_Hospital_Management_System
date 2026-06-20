@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <h2>Patients</h2>
+</div>
+
+<div class="tabs">
+    <a href="/patients/add" class="btn {% if mode == 'add' %}btn-primary{% else %}btn-secondary{% endif %}">➕
+        Register</a>
+    <a href="/patients/search" class="btn {% if mode == 'search' %}btn-primary{% else %}btn-secondary{% endif %}">🔍
+        Find</a>
+</div>
+
+{% if mode == 'add' or mode == 'edit' %}
+<div class="card">
+    <h3 class="card-title">{% if mode == 'edit' %}Edit Patient{% else %}Add New Patient{% endif %}</h3>
+    <form method="POST" action="{% if mode == 'edit' %}/update_patient{% else %}/add_patient{% endif %}">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Patient ID</label>
+                <input type="text" name="patient_id" value="{% if mode == 'edit' %}{{ patient[0] }}{% else %}{{ next_id }}{% endif %}" readonly
+                    style="background-color: var(--th-bg); color: var(--text-muted); cursor: not-allowed; font-weight: bold; border-color: transparent;">
+            </div>
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" name="first_name" value="{% if mode == 'edit' %}{{ patient[1] }}{% endif %}" placeholder="First Name" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" name="last_name" value="{% if mode == 'edit' %}{{ patient[2] }}{% endif %}" placeholder="Last Name" required>
+            </div>
+            <div class="form-group">
+                <label>Registration Date</label>
+                <input type="text" value="{% if mode == 'edit' %}{{ patient[7] }}{% else %}{{ reg_date }}{% endif %}" readonly
+                    style="background-color: var(--th-bg); color: var(--text-muted); cursor: not-allowed; font-weight: bold; border-color: transparent;">
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <select name="gender" required>
+                    <option value="" disabled {% if mode != 'edit' %}selected{% endif %}>Select Gender</option>
+                    <option value="M" {% if mode == 'edit' and patient[3] == 'M' %}selected{% endif %}>M</option>
+                    <option value="F" {% if mode == 'edit' and patient[3] == 'F' %}selected{% endif %}>F</option>
+                    <option value="O" {% if mode == 'edit' and patient[3] == 'O' %}selected{% endif %}>O</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" name="date_of_birth" value="{% if mode == 'edit' %}{{ patient[4] }}{% endif %}" required>
+            </div>
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="text" name="contact_number" value="{% if mode == 'edit' %}{{ patient[5] }}{% endif %}" placeholder="e.g.9874567321" required>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" name="address" value="{% if mode == 'edit' %}{{ patient[6] }}{% endif %}" placeholder="Tumkur Road" required>
+            </div>
+            <div class="form-group">
+                <label>Insurance Provider</label>
+                <input type="text" name="insurance_provider" value="{% if mode == 'edit' %}{{ patient[8] }}{% endif %}" placeholder="Provider Name">
+            </div>
+            <div class="form-group">
+                <label>Insurance Number</label>
+                <input type="text" name="insurance_number" value="{% if mode == 'edit' %}{{ patient[9] }}{% endif %}" placeholder="Policy ID">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="{% if mode == 'edit' %}{{ patient[10] }}{% endif %}" placeholder="Email Address">
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{% if mode == 'edit' %}Update Patient{% else %}Add Patient{% endif %}</button>
+            {% if mode == 'edit' %}
+            <a href="/patients/search" class="btn btn-secondary">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% if mode == 'search' %}
+<div class="card">
+    <h3 class="card-title">Search Patients</h3>
+    <form method="POST" action="/patients/search">
+        <div style="display: flex; gap: 1rem;">
+            <input type="text" name="search_query" value="{{ search_term if search_term else '' }}"
+                placeholder="Search by ID, Name, or Contact..." required style="flex: 1;">
+            <button type="submit" class="btn btn-primary">🔍 Find</button>
+            <a href="/patients/search" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% if mode == 'view' or mode == 'search' %}
+{% if mode == 'view' or patients|length > 0 %}
+<div class="card">
+    <h3 class="card-title">{% if mode == 'view' %}All Patient Records{% else %}Search Results{% endif %}</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Gender</th>
+                    <th>DOB</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Reg Date</th>
+                    <th>Insurance</th>
+                    <th>Ins No.</th>
+                    <th>Email</th>
+                    {% if mode == 'search' %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in patients %}
+                <tr>
+                    <td>{{ p[0] }}</td>
+                    <td>{{ p[1] }}</td>
+                    <td>{{ p[2] }}</td>
+                    <td>{{ p[3] }}</td>
+                    <td>{{ p[4] }}</td>
+                    <td>{{ p[5] }}</td>
+                    <td>{{ p[6] }}</td>
+                    <td>{{ p[7] }}</td>
+                    <td>{{ p[8] }}</td>
+                    <td>{{ p[9] }}</td>
+                    <td>{{ p[10] }}</td>
+                    {% if mode == 'search' %}
+                    <td>
+                        <div class="action-btns">
+                            <form method="GET" action="/edit_patient/{{ p[0] }}">
+                                <button type="submit" class="btn btn-edit" title="Edit"><i
+                                        class="hgi hgi-stroke hgi-pencil-edit-01"></i></button>
+                            </form>
+                            <form method="POST" action="/delete_patient/{{ p[0] }}">
+                                <button type="submit" class="btn btn-danger" title="Delete"><i
+                                        class="hgi hgi-stroke hgi-delete-02"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% elif mode == 'search' and search_term %}
+<div class="card">
+    <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No patients found matching "{{ search_term
+        }}".</p>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
