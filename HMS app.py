@@ -6,9 +6,9 @@ app = Flask(__name__)
 
 # Database connection
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="#Y&q!16*55",
+    host=" ",
+    user=" ",
+    password=" ",
     database="project_hms"
 )
 cursor = db.cursor()
